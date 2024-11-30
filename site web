@@ -1,0 +1,144 @@
+from flask import Flask, render_template_string
+
+app = Flask(__name__)
+
+# Sample news articles
+news_articles = [
+    {"id": 1, "title": "Breaking News: New Tech Innovations", "content": "Today we saw a breakthrough in technology..."},
+    {"id": 2, "title": "Sports Update: Local Team Wins Championship", "content": "In an exciting final, the local team emerged victorious..."},
+    {"id": 3, "title": "Politics: Election Results are In", "content": "The latest election results show a tight race between the candidates..."},
+]
+
+# Main page displaying list of news articles
+@app.route('/')
+def home():
+    return render_template_string('''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+        }
+        .news-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+        .news-item {
+            background-color: white;
+            border-radius: 8px;
+            margin: 10px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .news-item h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .news-item a {
+            text-decoration: none;
+            color: #333;
+        }
+        .news-item p {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>News Website</h1>
+    </header>
+
+    <div class="news-list">
+        {% for article in articles %}
+            <div class="news-item">
+                <h2><a href="{{ url_for('news_detail', id=article.id) }}">{{ article.title }}</a></h2>
+                <p>{{ article.content[:100] }}...</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+    ''', articles=news_articles)
+
+# Detailed news page
+@app.route('/news/<int:id>')
+def news_detail(id):
+    article = next((item for item in news_articles if item["id"] == id), None)
+    return render_template_string('''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ article.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+        }
+        .news-detail {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        footer a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ article.title }}</h1>
+    </header>
+
+    <div class="news-detail">
+        <p>{{ article.content }}</p>
+    </div>
+
+    <footer>
+        <a href="{{ url_for('home') }}">Back to News List</a>
+    </footer>
+</body>
+</html>
+    ''', article=article)
+
+if __name__ == "__main__":
+    app.run(debug=True)
